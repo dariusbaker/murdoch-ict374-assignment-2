@@ -16,6 +16,7 @@
 static const char white_space[2] = {(char) 0x20, (char) 0x09};
 
 typedef struct CommandStruct {
+  char * full;
   char * name;
   char * stdin;
   char * stdout;
