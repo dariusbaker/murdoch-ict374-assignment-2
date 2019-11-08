@@ -271,6 +271,7 @@ void collect_children() {
 
   while (collect) {
     pid = waitpid(-1, &status, WNOHANG);
+    mark_job_as_done(pid, next_job_index, job_list);
 
     if (pid <= 0) {
       collect = 0;
@@ -367,6 +368,8 @@ void empty_commands(Command ** commands) {
       argv_index++;
     }
 
+    commands[index]->full = NULL;
+
     if (commands[index]->name != NULL) {
       free(commands[index]->name);
     }
@@ -458,10 +461,15 @@ void create_piped_processes(Command ** piped_commands, int count) {
   int i;
   int status;
   int pids[count];
+  char full_command[BUF_SIZE];
+
   int is_background = 0;
   int num_of_pipes = count - 1;
   int pipes[num_of_pipes][2];
   Command * command = NULL;
+
+  // this seemed necessary else the string will sometimes start with '??s?'
+  full_command[0] = '\0';
 
   // create pipes
   for (i = 0; i < num_of_pipes; i++) {
@@ -510,6 +518,14 @@ void create_piped_processes(Command ** piped_commands, int count) {
       exit(1);
     }
 
+    // combine string to achieve full commmand line
+    strcat(full_command, command->full);
+
+    // add a pipe character
+    if (i < count - 1) {
+      strcat(full_command, "|");
+    }
+
     // save the child process ID
     pids[i] = pid;
   }
@@ -529,7 +545,12 @@ void create_piped_processes(Command ** piped_commands, int count) {
     for (i = 0; i < count; i++) {
       waitpid(pids[i], &status, 0);
     }
+  } else {
+    next_job_index = add_job(full_command, pids[0], next_job_index, job_list);
   }
+
+  // "empty" the string
+  full_command[0] = '\0';
 }
 
 /**
@@ -573,6 +594,8 @@ void create_process(Command * command) {
    */
   if (command->background == 0) {
     waitpid(pid, &status, 0);
+  } else {
+    next_job_index = add_job(command->full, pid, next_job_index, job_list);
   }
 }
 
@@ -622,6 +645,8 @@ int main(int argc, char * argv[]) {
       // unblock SIGCHLD so that we may catch completed background processes
       toggle_signal_block(SIG_UNBLOCK, SIGCHLD);
     }
+
+    next_job_index = print_jobs_done(next_job_index, job_list);
   }
 
   exit(0);

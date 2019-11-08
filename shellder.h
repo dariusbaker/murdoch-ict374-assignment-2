@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <wordexp.h>
 #include "command.h"
+#include "jobs.h"
 
 #define DEBUG 0
 #define BUF_SIZE 256
@@ -20,8 +21,10 @@
 /**
  * Global variables
  */
+int next_job_index = 0;
 char * shell_name = "%";
 Command * command_list[MAX_COMMANDS];
+Job * job_list[MAX_COMMANDS];
 
 /**
  * Methods
