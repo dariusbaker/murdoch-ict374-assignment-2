@@ -573,9 +573,6 @@ void close_pipes(int pipes[][2], int count) {
     close(pipes[i][0]);
     close(pipes[i][1]);
   }
-
-  // "empty" the string
-  full_command[0] = '\0';
 }
 
 /**
