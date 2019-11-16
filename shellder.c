@@ -410,6 +410,8 @@ void run_commands(Command ** commands) {
       print_working_directory();
     } else if (strcmp(command->name, BUILTIN_PROMPT) == 0) {
       prompt(command->argv[1]);
+    } else if (strcmp(command->name, BUILTIN_JOBS) == 0) {
+      next_job_index = print_jobs(next_job_index, job_list);
     } else {
       if (command->pipe > 0) {
         piped_commands[pipe_count] = command;
@@ -523,7 +525,7 @@ void create_piped_processes(Command ** piped_commands, int count) {
 
     // add a pipe character
     if (i < count - 1) {
-      strcat(full_command, "|");
+      strcat(full_command, " | ");
     }
 
     // save the child process ID

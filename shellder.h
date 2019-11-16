@@ -15,6 +15,7 @@
 #define BUF_SIZE 256
 #define BUILTIN_CHANGE_DIR "cd"
 #define BUILTIN_EXIT       "exit"
+#define BUILTIN_JOBS       "jobs"
 #define BUILTIN_PRINT_DIR  "pwd"
 #define BUILTIN_PROMPT     "prompt"
 
