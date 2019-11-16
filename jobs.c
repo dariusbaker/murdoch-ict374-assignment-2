@@ -43,37 +43,54 @@ int add_job(char * command, int process_id, int index, Job ** jobs) {
   new_job->index      = index;
   new_job->done       = 0;
 
-  printf("[%d] %d\n", index + 1, process_id);
-
   jobs[index] = new_job;
 
   return index + 1;
 }
 
 /**
- * Helper function that prints jobs in the array.
+ * Prints jobs and their status in the list and frees job if it's done.
+ * Returns index of job farthest from 0.
  *
- * @param {int}    index
- * @param {Job **} jobs
+ * @param  {int}    index
+ * @param  {Job **} jobs
+ * @return {int}
  */
-void print_jobs(int index, Job ** jobs) {
+int print_jobs(int index, Job ** jobs) {
   int i;
+  int new_index = index;
+  char status[16];
   Job * job = NULL;
 
   for (i = 0; i < index; i++) {
     if (jobs[i] != NULL) {
       job = jobs[i];
-      printf("Job | %s | %d | %d\n", job->command, job->process_id, job->done);
+
+      if (job->done == 1) {
+        strcpy(status, "Done");
+      } else {
+        strcpy(status, "Running");
+      }
+
+      // display job
+      printf("[%d]   %-23s %s\n", job->index + 1, status, job->command);
+
+      // free job if already done
+      if (job->done == 1) {
+        new_index = free_job(job->index, index, jobs);
+      }
     }
   }
 
-  printf("print_jobs | index: %d\n", index);
+  // "empty" the string
+  status[0] = '\0';
+
+  return new_index;
 };
 
 /**
- * Frees a job from an array and memory.
- * Returns 0 if job_index == current_index - 1, which signifies that we freed
- * the last job in the array. Otherwise, we just return what was given to us.
+ * Frees a job from an array and memory, then returns the index of the job
+ * farthest from 0.
  *
  * @param  {int}    job_index
  * @param  {int}    current_index
@@ -81,17 +98,22 @@ void print_jobs(int index, Job ** jobs) {
  * @return {int}
  */
 int free_job(int job_index, int current_index, Job ** jobs) {
+  int i;
+  int last_index = 0;
+
   if (jobs[job_index] != NULL) {
     jobs[job_index]->command[0] = '\0';
     free(jobs[job_index]);
     jobs[job_index] = NULL;
   }
 
-  if (job_index == current_index - 1) {
-    return 0;
+  for (i = 0; i < current_index; i++) {
+    if (jobs[i] != NULL) {
+      last_index = i + 1;
+    }
   }
 
-  return current_index;
+  return last_index;
 }
 
 /**
