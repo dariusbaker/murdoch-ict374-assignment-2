@@ -1,32 +1,32 @@
-#include "program.h"
+#include "command.h"
 
 /**
- * Helper program that prints program attributes.
- * @param {program *} program
+ * Helper command that prints Command attributes.
+ * @param {Command *} command
  */
-void print_program(program * program) {
+void print_command(Command * command) {
   printf("-----------------------------------------------\n");
-  printf("| %-24s | %-16s |\n", "Name", program->name);
-  printf("| %-24s | %-16d |\n", "argc", program->argc);
-  for (int i = 0; i < program->argc; i++) {
-    printf("| argv[%d]                  | %-16s |\n", i, program->argv[i]);
+  printf("| %-24s | %-16s |\n", "Name", command->name);
+  printf("| %-24s | %-16d |\n", "argc", command->argc);
+  for (int i = 0; i < command->argc; i++) {
+    printf("| argv[%d]                  | %-16s |\n", i, command->argv[i]);
   }
-  printf("| %-24s | %-16d |\n", "Runs in background?", program->background);
-  printf("| %-24s | %-16d |\n", "Pipes to program",    program->pipe);
-  printf("| %-24s | %-16d |\n", "Redirection",         program->redirection);
-  printf("| %-24s | %-16s |\n", "Redirect input",      program->stdin);
-  printf("| %-24s | %-16s |\n", "Redirect output",     program->stdout);
+  printf("| %-24s | %-16d |\n", "Runs in background?", command->background);
+  printf("| %-24s | %-16d |\n", "Pipes to command",    command->pipe);
+  printf("| %-24s | %-16d |\n", "Redirection",         command->redirection);
+  printf("| %-24s | %-16s |\n", "Redirect input",      command->stdin);
+  printf("| %-24s | %-16s |\n", "Redirect output",     command->stdout);
   printf("-----------------------------------------------\n");
 }
 
 /**
  * Splits a string by whitespace to extract arguments (argv) and saves them
- * into the program instance provided.
+ * into the Command instance provided.
  * @param  {char *}    input
- * @param  {program *} program
+ * @param  {Command *} command
  * @return {int}
  */
-int get_arguments(char * input, program * program) {
+int get_arguments(char * input, Command * command) {
   char * token = NULL;
   int argument_count = 0;
 
@@ -48,14 +48,14 @@ int get_arguments(char * input, program * program) {
 
       // add expanded patterns to argv
       for (int i = 0; i < result.gl_pathc; i++) {
-        program->argv[argument_count] = strdup(result.gl_pathv[i]);
+        command->argv[argument_count] = strdup(result.gl_pathv[i]);
         argument_count++;
       }
 
       globfree(&result);
     } else {
       // duplicate string and add to arguments array
-      program->argv[argument_count] = strdup(token);
+      command->argv[argument_count] = strdup(token);
 
       // increment count
       argument_count++;
@@ -91,18 +91,18 @@ char * get_separator(char * input) {
 }
 
 /**
- * Populates a program struct with the found/required attributes and returns
+ * Populates a Command struct with the found/required attributes and returns
  * a pointer to that instance.
  * @param  {char *}    input
  * @param  {int}       background
  * @param  {int}       pipe
- * @return {program *}
+ * @return {Command *}
  */
-program * make_program(char * input, int background, int pipe) {
+Command * make_command(char * input, int background, int pipe) {
   char    * token         = NULL;
   char    * stdin_result  = index(input, * SEPARATOR_INPUT);
   char    * stdout_result = index(input, * SEPARATOR_OUTPUT);
-  program * program       = calloc(1, sizeof(program));
+  Command * command       = calloc(1, sizeof(Command));
 
   if (stdout_result != NULL) {
     // output redirection found
@@ -112,8 +112,8 @@ program * make_program(char * input, int background, int pipe) {
     token = strtok(NULL, " ");
 
     // save the redirection; 1 for standard input (fd[1])
-    program->redirection = 1;
-    program->stdout = strdup(token);
+    command->redirection = 1;
+    command->stdout = strdup(token);
   } else if (stdin_result != NULL) {
     // input redirection found
     token = strtok(input, SEPARATOR_INPUT);
@@ -122,51 +122,51 @@ program * make_program(char * input, int background, int pipe) {
     token = strtok(NULL, " ");
 
     // save the redirection; 0 for standard input (fd[0])
-    program->redirection = 0;
-    program->stdin = strdup(token);
+    command->redirection = 0;
+    command->stdin = strdup(token);
   }
 
   // save other attributes
-  program->argc       = get_arguments(input, program);
-  program->name       = program->argv[0];
-  program->background = background;
-  program->pipe       = pipe;
+  command->argc       = get_arguments(input, command);
+  command->name       = command->argv[0];
+  command->background = background;
+  command->pipe       = pipe;
 
-  //print_program(program);
+  //print_command(command);
 
   // only return the struct if there're valid arguments
-  if (program->argc > 0) {
-    return program;
+  if (command->argc > 0) {
+    return command;
   } else {
-    free(program);
+    free(command);
     return NULL;
   }
 }
 
 /**
- * Processes a program line entry, extracts jobs and programs, and then saves
- * these programs into an array containing program structs.
+ * Processes a command line entry, extracts jobs and commands, and then saves
+ * these commands into an array containing Command structs.
  * @param {char *}     input
  * @param {int}        background
  * @param {int}        pipe
- * @param {program **} programs
+ * @param {Command **} commands
  */
-void handle_program_line(
+void handle_command_line(
   char * input,
   int background,
   int pipe,
   int iteration,
-  program ** programs
+  Command ** commands
 ) {
   int is_background = 0;
   int is_pipe       = 0;
   char * separator  = NULL;
   char * token      = NULL;
-  static int program_count;
+  static int command_count;
 
-  // reset program count if we're running this method as a fresh run
+  // reset command count if we're running this method as a fresh run
   if (iteration == 0) {
-    program_count = 0;
+    command_count = 0;
   }
 
   if ((separator = get_separator(input)) != NULL) {
@@ -179,19 +179,19 @@ void handle_program_line(
     }
 
     if (strcmp(separator, SEPARATOR_PIPE) == 0) {
-      is_pipe = program_count + 1;
+      is_pipe = command_count + 1;
     }
 
     // process the input again to see if anymore separators are present
-    handle_program_line(input, is_background, is_pipe, 1, programs);
+    handle_command_line(input, is_background, is_pipe, 1, commands);
   } else {
     // no special characters found
-    programs[program_count] = make_program(input, background, pipe);
-    program_count++;
+    commands[command_count] = make_command(input, background, pipe);
+    command_count++;
   }
 
   // run method again if input is still available
   if (token != NULL) {
-    handle_program_line(token, background, pipe, 1, programs);
+    handle_command_line(token, background, pipe, 1, commands);
   }
 }
