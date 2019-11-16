@@ -45,6 +45,8 @@ int add_job(char * command, int process_id, int index, Job ** jobs) {
 
   jobs[index] = new_job;
 
+  printf("[%d] %d\n", index + 1, process_id);
+
   return index + 1;
 }
 
