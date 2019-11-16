@@ -10,12 +10,12 @@
 #define SEPARATOR_SEQUENTIAL ";"
 #define WILDCARD_ALL         '*'
 #define WILDCARD_EXACT       '?'
-#define MAX_COMMANDS  100
+#define MAX_programS  100
 #define MAX_ARGUMENTS 1000
 
 static const char white_space[2] = {(char) 0x20, (char) 0x09};
 
-typedef struct CommandStruct {
+typedef struct programStruct {
   char * name;
   char * stdin;
   char * stdout;
@@ -24,16 +24,16 @@ typedef struct CommandStruct {
   int    background;
   int    pipe;
   int    redirection;
-} Command;
+} program;
 
-Command * make_command(char * input, int background, int pipe);
-int    get_arguments(char * input, Command * command);
+program * make_program(char * input, int background, int pipe);
+int    get_arguments(char * input, program * program);
 char * get_separator(char * input);
-void   print_command(Command * command);
-void   handle_command_line(
+void   print_program(program * program);
+void   handle_program_line(
   char * input,
   int background,
   int pipe,
   int iteration,
-  Command ** commands
+  program ** programs
 );
