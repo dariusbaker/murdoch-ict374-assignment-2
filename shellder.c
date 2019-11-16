@@ -526,6 +526,14 @@ void create_piped_processes(Command ** piped_commands, int count) {
       strcat(full_command, "|");
     }
 
+    // combine string to achieve full commmand line
+    strcat(full_command, command->full);
+
+    // add a pipe character
+    if (i < count - 1) {
+      strcat(full_command, "|");
+    }
+
     // save the child process ID
     pids[i] = pid;
   }
@@ -565,6 +573,9 @@ void close_pipes(int pipes[][2], int count) {
     close(pipes[i][0]);
     close(pipes[i][1]);
   }
+
+  // "empty" the string
+  full_command[0] = '\0';
 }
 
 /**
