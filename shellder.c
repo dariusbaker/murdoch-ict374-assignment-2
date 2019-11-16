@@ -1,110 +1,13 @@
-#include "myshell.h"
+#include "shellder.h"
 
 /**
- * Test that the program can correctly process basic and built-in commands.
- * Marking guide #2 & #3
+ * Test that the program can run processes in the background, like "sleep 10 &".
+ * Satisfies:
+ * - Issue #8
+ * - Requirement #9
+ * - Marking guide #7
  */
-void test_2_3() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[10] = {
-    "ls",
-    "ps",
-    "prompt myshell",
-    "cd /tmp",
-    "pwd",
-    "cd",
-    "pwd",
-    "cd ..",
-    "pwd",
-    "echo a bb ccc dddd 1 22 333 4444 555555",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can correctly process commands with multiple arguments.
- * Marking guide #4
- */
-void test_4() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[3] = {
-    "ls -l -a -h -i -e -g -m -n -p",
-    "echo a bb ccc dddd 1 22 333 4444 555555",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can correctly process commands with Wildcards.
- * Marking guide #5
- */
-void test_5() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[6] = {
-    "ls -l /tmp/*.c",
-    "ls -l /tmp/a*c",
-    "ls -l /tmp/abc.?",
-    "ls -l /tmp/abc*.?",
-    "ls -l /dev/*",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can run commands sequentially.
- * Marking guide #6
- */
-void test_6() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[4] = {
-    "sleep 3 ; echo hello",
-    "sleep 3 ; ls -l",
-    "sleep 3 ; echo hello1 ; sleep 3 ; echo hello2",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can run processes in the background.
- * Marking guide #7
- */
-void test_7() {
+void test_background() {
   int index = 0;
   char command[BUF_SIZE];
   char * test_commands[6] = {
@@ -126,70 +29,16 @@ void test_7() {
 }
 
 /**
- * Test that the program can perform redirection (input or output).
- * Marking guide #8 & #9
+ * Test that the program can run a combination of commands.
+ * Satisfies:
+ * - Issue #14
+ * - Requirement #8, 9, 10
+ * - Marking guide #12
  */
-void test_8_9() {
+void test_combination() {
   int index = 0;
   char command[BUF_SIZE];
-  char * test_commands[5] = {
-    "cat < /tmp/foo",
-    "grep line < /tmp/foo",
-    "ls -l > /tmp/junk",
-    "cat /tmp/foo > /tmp/junk2",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can execute simple and long pipelines.
- * Marking guide #10 & #11
- */
-void test_10_11() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[5] = {
-    "ps -ef | head",
-    "ps -ef | grep usr | head",
-    "ps -ef | grep usr | head -6 | tail -3",
-    "ps -ef | grep usr | head -4; date",
-    "cat /tmp/foo | cat",
-    "cat /tmp/foo | grep line",
-    "cat /tmp/foo | sort",
-    "cat /tmp/foo | sort -r",
-    "cat /tmp/foo | sort | sort -r | grep line",
-    "cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat",
-    "cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat > junk",
-    "cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | grep line",
-    NULL
-  };
-
-  while (test_commands[index] != NULL) {
-    strcpy(command, test_commands[index]);
-    handle_command_line(command, 0, 0, 0, command_list);
-    execute_commands(command_list);
-    empty_commands(command_list);
-    index++;
-  }
-}
-
-/**
- * Test that the program can run combinations of commands.
- * Marking guide #12
- */
-void test_12() {
-  int index = 0;
-  char command[BUF_SIZE];
-  char * test_commands[3] = {
-    "ls -l > junk ; cat < junk ; /bin/ls -lt /dev/tty* | grep tty | sort | head > junk2 & sleep 10 ; cat < junk2",
+  char * test_commands[2] = {
     "ls -lt | cat > junk ; ps | sort & echo ps-output ; sleep 10 & echo wait-for-10seconds ; cat junk | cat | grep a | sort -r",
     NULL
   };
@@ -203,22 +52,124 @@ void test_12() {
   }
 }
 
+/**
+ * Test that the program can correctly process commands with multiple arguments,
+ * like "% ls -l -a -h"
+ * Satisfies:
+ * - Issue #11
+ * - Requirement #(N/A)
+ * - Marking guide #4
+ */
+void test_multiple_command_args() {
+  int index = 0;
+  char command[BUF_SIZE];
+  char * test_commands[4] = {
+    "ls -l -a -h -i -e -g -m -n -p",
+    "echo foo bar lorem ipsum dolor sit amet",
+    NULL
+  };
 
-
+  while (test_commands[index] != NULL) {
+    strcpy(command, test_commands[index]);
+    handle_command_line(command, 0, 0, 0, command_list);
+    execute_commands(command_list);
+    empty_commands(command_list);
+    index++;
+  }
+}
 
 /**
-*
-*
-* Helper functions
-*
-*
-*/
+ * Test that the program can execute piped commands.
+ * Example: "ps -ef | grep usr | head".
+ * Satisfies:
+ * - Issue #7, #13
+ * - Requirement #8
+ * - Marking guide #10, #11
+ */
+void test_pipes() {
+  int index = 0;
+  char command[BUF_SIZE];
+  char * test_commands[5] = {
+    "ps -ef | head",
+    "ps -ef | grep usr | head",
+    "ps -ef | grep usr | head -6 | tail -3",
+    "ps -ef | grep usr | head -4; date",
+    NULL
+  };
 
-
-
+  while (test_commands[index] != NULL) {
+    strcpy(command, test_commands[index]);
+    handle_command_line(command, 0, 0, 0, command_list);
+    execute_commands(command_list);
+    empty_commands(command_list);
+    index++;
+  }
+}
 
 /**
- * Changes prompt name.
+ * Test that the program can perform redirection (input or output).
+ * Example: "cat foo > bar", "cat < foo".
+ * Satisfies:
+ * - Issue #6
+ * - Requirement #7
+ * - Marking guide #8, 9
+ */
+void test_redirection() {
+  int index = 0;
+  char command[BUF_SIZE];
+  char * test_commands[5] = {
+    "cat foo > bar",
+    "cat foo2 > bar",
+    "cat < bar",
+    "grep 99 < bar",
+    NULL
+  };
+
+  while (test_commands[index] != NULL) {
+    strcpy(command, test_commands[index]);
+    handle_command_line(command, 0, 0, 0, command_list);
+    execute_commands(command_list);
+    empty_commands(command_list);
+    index++;
+  }
+}
+
+/**
+ * Test that the program can run commands sequentially. (e.g. % ps; ls)
+ * Satisfies:
+ * - Issue #10
+ * - Requirement #10
+ * - Marking guide #6
+ */
+void test_sequential() {
+  int index = 0;
+  char command[BUF_SIZE];
+  char * test_commands[4] = {
+    "sleep 3 ; echo hello",
+    "sleep 3 ; ls -l",
+    "sleep 3 ; echo hello1 ; sleep 3 ; echo hello2",
+    NULL
+  };
+
+  while (test_commands[index] != NULL) {
+    strcpy(command, test_commands[index]);
+    handle_command_line(command, 0, 0, 0, command_list);
+    execute_commands(command_list);
+    empty_commands(command_list);
+    index++;
+  }
+}
+
+/**
+ * Changes prompt name. Does nothing if argument is an empty string.
+ * Returns 0 if changed, 1 if not.
+ * Satisfies:
+ * - Issue #1
+ * - Requirement #3
+ * - Marking guide #3
+ *
+ * @param  {char *} input
+ * @return {int}
  */
 int prompt(char * input) {
   if (input != NULL && strlen(input) > 0) {
@@ -230,7 +181,14 @@ int prompt(char * input) {
 }
 
 /**
- * Imitates cd command
+ * Changes working directory, which will be set to the user's home directory
+ * if the argument "input" is empty.
+ * Satisfies:
+ * - Issue #3
+ * - Requirement #5
+ * - Marking guide #3
+ *
+ * @param {char *} input
  */
 void change_directory(char * input) {
   if (input != NULL) {
@@ -249,7 +207,13 @@ void change_directory(char * input) {
 }
 
 /**
- * Imitates pwd
+ * Prints current working directory.
+ * Satisfies:
+ * - Issue #2
+ * - Requirement #4
+ * - Marking guide #3
+ *
+ * @return {int}
  */
 int print_working_directory() {
   char current_dir[1024];
@@ -296,7 +260,10 @@ int set_redirection(Command * command) {
 }
 
 /**
- * Recursively collect zombies.
+ * Recursively collect background processes (zombies).
+ * Satisfies:
+ * - Issue #16
+ * - Marking guide #14
  */
 void collect_children() {
   int collect = 1;
@@ -313,7 +280,8 @@ void collect_children() {
 }
 
 /**
- * Handle SIGCHLD.
+ * Signal handler; we're only handling SIGCHLD.
+ * @param {int} signal_number
  */
 void handle_signals(int signal_number) {
   if (signal_number == SIGCHLD) {
@@ -323,6 +291,10 @@ void handle_signals(int signal_number) {
 
 /**
  * Ignore interrupt, quit, and stop signals, catch child termination signal.
+ * Returns 0 if successful with setup.
+ * Should satisfy marking guide #13.
+ *
+ * @return {int}
  */
 int setup_signals() {
   struct sigaction act;
@@ -331,16 +303,18 @@ int setup_signals() {
   act.sa_flags = 0;
   act.sa_handler = handle_signals;
 
-
+  // catch SIGCHLD
   if (sigaction(SIGCHLD, &act, NULL) != 0) {
     perror("sigaction");
     exit(1);
   }
 
+  // if we're debugging, don't ignore the other signals to allow easy exit.
   if (DEBUG == 1) {
     return 0;
   }
 
+  // add signals we want to ignore
   sigemptyset(&signal_set);
   sigaddset(&signal_set, SIGINT);
   sigaddset(&signal_set, SIGQUIT);
@@ -356,6 +330,13 @@ int setup_signals() {
 
 /**
  * Blocks or unblocks a signal.
+ * Primarily used to block the SIGCHLD signal while the shell is still
+ * waiting for a process to complete, so that the signal doesn't interrupt the
+ * main while loop and prematurely show the prompt.
+ *
+ * @param  {int} how           | Values like SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK.
+ * @param  {int} signal_number | Values like SIGCHLD, SIGINT, etc.
+ * @return {int}
  */
 int toggle_signal_block(int how, int signal_number) {
   sigset_t signal_set;
@@ -371,7 +352,8 @@ int toggle_signal_block(int how, int signal_number) {
 }
 
 /**
- * Empties the command list so that it may be used for the next round of command line processing.
+ * Empties the command list so that it may be used for the next round of
+ * command line processing.
  */
 void empty_commands(Command ** commands) {
   int index = 0;
@@ -407,7 +389,9 @@ void empty_commands(Command ** commands) {
 }
 
 /**
- * Create child processes to run the other shell commands found in list.
+ * Executes commands found in list.
+ * If any of the built-in commands are found, we'll simply run those methods.
+ * Otherwise, we'll fork child processes to run the other shell commands.
  */
 void execute_commands(Command ** commands) {
   int index = 0;
@@ -450,7 +434,9 @@ void execute_commands(Command ** commands) {
 }
 
 /**
- * Creates child processes.
+ * Creates child processes and pipes between them.
+ * @param {Command **} piped_commands
+ * @param {int}        count
  */
 void create_piped_processes(Command ** piped_commands, int count) {
   pid_t pid;
@@ -482,7 +468,17 @@ void create_piped_processes(Command ** piped_commands, int count) {
     }
 
     if (pid == 0) {
-
+      //printf("create_process | %s | %d\n", command->name, getpid());
+      /**
+       * Connect appropriate descriptors to relevant pipe ends.
+       *
+       * Visualisation:
+       * [Process 1]───────────────┐ (writes into pipe[0][1]])
+       * |------------((R) Pipe 1 (W))
+       * [Process 2]────┴──────────┐ (writes into pipe[1][1], reads from pipe[0][0])
+       * |------------((R) Pipe 2 (W))
+       * [Process 3]────┘            (reads from pipe[1][0])
+       */
       if (i == 0) {
         dup2(pipes[i][1], 1);     // write into [1] of first pipe
       } else if (i == num_of_pipes) {
@@ -492,21 +488,25 @@ void create_piped_processes(Command ** piped_commands, int count) {
         dup2(pipes[i][1], 1);     // write into [1] of next pipe
       }
 
+      //
       if (command->stdin != NULL || command->stdout != NULL) {
         set_redirection(command);
       }
 
+      // we need to close the pipes else the process "hangs"; can't write/read if the other end is open.
       for (j = 0; j < num_of_pipes; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
       }
 
+      // print error if we're unable to execute the command
       if (execvp(command->name, command->argv) < 0) {
         fprintf(stderr, "%s: %s\n", command->name, strerror(errno));
         exit(1);
       }
     }
 
+    // save the child process ID
     pids[i] = pid;
   }
 
@@ -518,6 +518,11 @@ void create_piped_processes(Command ** piped_commands, int count) {
 
   /*
    * Wait for each child process created previously.
+   * This approach seems more 'air-tight' than the previous "wait(&status)" one,
+   * which seemed to cause problems with background processes and multiple pipes.
+   * Example: "sleep 10 & ps -ef | grep usr | head | sort"
+   * ... would seem to wait for "sleep 10" to complete even though it's a
+   * background process. Using "waitpid" seems to fix this.
    */
   if (is_background == 0) {
     for (i = 0; i < count; i++) {
@@ -528,18 +533,22 @@ void create_piped_processes(Command ** piped_commands, int count) {
 
 /**
  * Creates child process that runs command.
+ * @param {Command *}
  */
 void create_process(Command * command) {
+  //printf("create_process | %s | %d\n", command->name, getpid());
   pid_t pid;
   int status;
 
   pid = fork();
 
   if (pid == 0) {
+    //printf("create_process | %s | %d\n", command->name, getpid());
     if (command->stdin != NULL || command->stdout != NULL) {
       set_redirection(command);
     }
 
+    // print error if we're unable to execute the command
     if (execvp(command->name, command->argv) < 0) {
       fprintf(stderr, "%s: %s\n", command->name, strerror(errno));
       exit(1);
@@ -550,7 +559,11 @@ void create_process(Command * command) {
   }
 
   /**
-   * Parent waits if command is running in the background.
+   * Parent only waits if command is meant to run in the background.
+   * Satisfies:
+   * - Issue #8
+   * - Requirement #9
+   * - Marking guide #7
    */
   if (command->background == 0) {
     waitpid(pid, &status, 0);
@@ -558,52 +571,49 @@ void create_process(Command * command) {
 }
 
 /**
- * Main program
+ * Driver program.
+ * @param  {int}    argc
+ * @param  {char *} argv[]
+ * @return {int}
  */
 int main(int argc, char * argv[]) {
   char input[BUF_SIZE];
   char * input_pointer = NULL;
 
-  // Tests;
-  printf("Running tests 2 and 3..\n");
-  test_2_3();
-  printf("Running test 4..\n");
-  test_4();
-  printf("Running test 5..\n");
-  test_5();
-  printf("Running test 6..\n");
-  test_6();
-  printf("Running test 7..\n");
-  test_7();
-  printf("Running tests 8 and 9..\n");
-  test_8_9();
-  printf("Running tests 10 and 11..\n");
-  test_10_11();
-  printf("Running test 12..\n");
-  test_12();
-
+  //test_sequential();
   setup_signals();
 
+  // run infinite loop; prompt for input and execute commands
   while (1) {
     printf("%s ", shell_name);
     input_pointer = fgets(input, BUF_SIZE, stdin);
 
+    /**
+     * Force a re-read if a signal interrupts our fgets.
+     * Satisfies:
+     * - Issue #17
+     * - Marking guide #15
+     */
     while (input_pointer == NULL && errno == EINTR) {
       input_pointer = fgets(input, BUF_SIZE, stdin);
     }
 
-
+    // remove newline character
     input[strlen(input) - 1] = '\0';
 
-
+    // only proceed if input is not empty; allows for empty returns (hitting enter with no input)
     if (strlen(input) > 0) {
-
+      /**
+       * Block SIGCHLD so that the signal doesn't interrupt our loop if our
+       * shell still waiting for a process to complete.
+       */
       toggle_signal_block(SIG_BLOCK, SIGCHLD);
 
       handle_command_line(input, 0, 0, 0, command_list);
       execute_commands(command_list);
       empty_commands(command_list);
 
+      // unblock SIGCHLD so that we may catch completed background processes
       toggle_signal_block(SIG_UNBLOCK, SIGCHLD);
     }
   }
