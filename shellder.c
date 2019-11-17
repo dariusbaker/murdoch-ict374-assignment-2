@@ -360,8 +360,6 @@ void empty_commands(Command ** commands) {
   int argv_index = 0;
 
   while (commands[index] != NULL) {
-    //printf("** freeing: %s, %p\n", commands[index]->name, commands[index]);
-
     // nullify arguments
     while (commands[index]->argv[argv_index] != NULL) {
       commands[index]->argv[argv_index] = NULL;
@@ -574,7 +572,6 @@ void close_pipes(int pipes[][2], int count) {
  * @param {Command *}
  */
 void create_process(Command * command) {
-  //printf("create_process | %s | %d\n", command->name, getpid());
   pid_t pid;
   int status;
 
@@ -611,7 +608,6 @@ int main(int argc, char * argv[]) {
   char input[BUF_SIZE];
   char * input_pointer = NULL;
 
-  //test_sequential();
   setup_signals();
 
   // run infinite loop; prompt for input and execute commands

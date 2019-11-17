@@ -152,8 +152,6 @@ Command * make_command(char * input, int background, int pipe) {
   // "empty" the string
   clean_command[0] = '\0';
 
-  //print_command(command);
-
   // only return the struct if there're valid arguments
   if (command->argc > 0) {
     return command;

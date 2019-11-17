@@ -141,34 +141,3 @@ int print_jobs_done(int index, Job ** jobs) {
 
   return return_index;
 }
-/*
-int main(void) {
-  Job * job_list[100];
-  int next_job_index = 0;
-
-  next_job_index = add_job("sleep 1", 1111, next_job_index, job_list);
-  next_job_index = add_job("sleep 2", 1112, next_job_index, job_list);
-  next_job_index = add_job("sleep 3", 1113, next_job_index, job_list);
-
-  print_jobs(next_job_index, job_list);
-
-  mark_job_as_done(1112, next_job_index, job_list);
-  mark_job_as_done(1113, next_job_index, job_list);
-
-  next_job_index = add_job("sleep 20", 1114, next_job_index, job_list);
-
-  print_jobs_done(next_job_index, job_list);
-
-  mark_job_as_done(1111, next_job_index, job_list);
-  mark_job_as_done(1114, next_job_index, job_list);
-
-  print_jobs_done(next_job_index, job_list);
-
-  next_job_index = add_job("sleep 5", 1115, next_job_index, job_list);
-
-  print_jobs_done(next_job_index, job_list);
-
-  print_jobs_done(next_job_index, job_list);
-
-  return 0;
-}*/
