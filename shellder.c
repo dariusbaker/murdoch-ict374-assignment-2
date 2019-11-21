@@ -161,6 +161,22 @@ void test_sequential() {
 }
 
 /**
+ * Print program enviroment variables.
+ * Satisfies
+ * - Requirement #11
+ */
+void test_envp(char * envp[]) {
+  int i = 0;
+
+  while (envp[i] != NULL) {
+    printf("envp[%d]: %s\n", i, envp[i]);
+    i++;
+  }
+
+  return;
+}
+
+/**
  * Changes prompt name. Does nothing if argument is an empty string.
  * Returns 0 if changed, 1 if not.
  * Satisfies:
@@ -604,7 +620,7 @@ void create_process(Command * command) {
  * @param  {char *} argv[]
  * @return {int}
  */
-int main(int argc, char * argv[]) {
+int main(int argc, char * argv[], char * envp[]) {
   char input[BUF_SIZE];
   char * input_pointer = NULL;
 

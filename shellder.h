@@ -60,3 +60,4 @@ void test_multiple_command_args();
 void test_pipes();
 void test_redirection();
 void test_sequential();
+void test_envp(char * envp[]);
