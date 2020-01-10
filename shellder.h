@@ -9,29 +9,35 @@
 #include <unistd.h>
 #include <wordexp.h>
 #include "command.h"
+#include "jobs.h"
 
 #define DEBUG 0
 #define BUF_SIZE 256
 #define BUILTIN_CHANGE_DIR "cd"
 #define BUILTIN_EXIT       "exit"
+#define BUILTIN_JOBS       "jobs"
 #define BUILTIN_PRINT_DIR  "pwd"
 #define BUILTIN_PROMPT     "prompt"
 
 /**
  * Global variables
  */
+int next_job_index = 0;
 char * shell_name = "%";
 Command * command_list[MAX_COMMANDS];
+Job * job_list[MAX_COMMANDS];
 
 /**
  * Methods
  */
+void close_pipes(int pipes[][2], int count);
 void collect_children();
 void create_piped_processes(Command ** piped_commands, int count);
 void create_process(Command * command);
 void empty_commands(Command ** commands);
-void execute_commands(Command ** commands);
+void execute_command(Command * command);
 void handle_signals();
+void run_commands(Command ** commands);
 
 int set_redirection(Command * command);
 int setup_signals();
@@ -54,3 +60,4 @@ void test_multiple_command_args();
 void test_pipes();
 void test_redirection();
 void test_sequential();
+void test_envp(char * envp[]);

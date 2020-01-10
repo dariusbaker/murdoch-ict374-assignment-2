@@ -6,6 +6,7 @@
  */
 void print_command(Command * command) {
   printf("-----------------------------------------------\n");
+  printf("| %-24s | %-16s |\n", "Full", command->full);
   printf("| %-24s | %-16s |\n", "Name", command->name);
   printf("| %-24s | %-16d |\n", "argc", command->argc);
   for (int i = 0; i < command->argc; i++) {
@@ -103,6 +104,10 @@ Command * make_command(char * input, int background, int pipe) {
   char    * stdin_result  = index(input, * SEPARATOR_INPUT);
   char    * stdout_result = index(input, * SEPARATOR_OUTPUT);
   Command * command       = calloc(1, sizeof(Command));
+  char clean_command[256];
+
+  // this seemed necessary else the string will sometimes start with '??s?'
+  clean_command[0] = '\0';
 
   if (stdout_result != NULL) {
     // output redirection found
@@ -132,7 +137,20 @@ Command * make_command(char * input, int background, int pipe) {
   command->background = background;
   command->pipe       = pipe;
 
-  //print_command(command);
+  // loop through arguments to get a clean command; no excess whitespace
+  for (int i = 0; i < command->argc; i++) {
+    strcat(clean_command, command->argv[i]);
+    strcat(clean_command, " ");
+  }
+
+  // replace last space with terminator
+  clean_command[strlen(clean_command) - 1] = '\0';
+
+  // duplicate the string pointer
+  command->full = strdup(clean_command);
+
+  // "empty" the string
+  clean_command[0] = '\0';
 
   // only return the struct if there're valid arguments
   if (command->argc > 0) {
