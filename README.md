@@ -1,4 +1,5 @@
-# Project 1: A Simple Unix Shell
+# Murdoch TSA 2019 ICT374 Assignment 2
+Building a simple UNIX shell. Below is the assignment brief. For those of you who have somehow stumbled upon this through the vast internet and wondering if the source code is any good, this assignment was graded 83/100. A bug was found when trying to use `>>`.
 
 ## Table of contents
 
@@ -19,10 +20,10 @@ Design and implement a simple UNIX shell program using the grammar specified in 
 1. **At least 1000 arguments in each command**
 1. **Reconfigurable shell prompt (default %)**
 
-    The shell must have a shell built-in command prompt for changing the current prompt. For example, typing the following command:  
-    `% prompt john$`  
+    The shell must have a shell built-in command prompt for changing the current prompt. For example, typing the following command:
+    `% prompt john$`
     ... should change the shell prompt to `john$`, i.e., the second token of the command.
-  
+
 1. **The shell built-in command pwd**
 
     This command prints the current directory (also known as working directory) of the shell process.
@@ -33,36 +34,36 @@ Design and implement a simple UNIX shell program using the grammar specified in 
 
 1. **Wildcard characters**
 
-    If a token contains wildcard characters `*` or `?` the token is treated as a filename. The wildcard characters in such a token indicate to the shell that the filename must be expanded. For example the command:  
-    `% ls *.c`  
+    If a token contains wildcard characters `*` or `?` the token is treated as a filename. The wildcard characters in such a token indicate to the shell that the filename must be expanded. For example the command:
+    `% ls *.c`
     ... may be expanded to ls ex1.c ex2.c ex3.c if there are three matching files ex1.c ex2.c ex3.c in the current directory. You may implement this feature using the C function `glob`.
 
 1. **Standard input and output redirections > and <**
 
-    For example:  
-    `% ls -lt >  foo`  
-    would redirect the standard output of process `ls -lt` to file `foo`. Similarly in the following command:  
-    `% cat <  foo`  
+    For example:
+    `% ls -lt >  foo`
+    would redirect the standard output of process `ls -lt` to file `foo`. Similarly in the following command:
+    `% cat <  foo`
     the standard input of process `cat` is redirected to file `foo`.
 
 1. **Shell pipeline |**
 
-    For example:  
-    `% ls -lt | more`  
+    For example:
+    `% ls -lt | more`
     the standard output of process `ls -lt` is connected to the standard input of process `more` via a pipe.
 
 1. **Background job execution**
 
-    For example:  
-    `% xterm &`  
-    The commannd line starts command `xterm` in the background (i.e., the shell will not wait for the process to terminate and you can type in the next command immediately). The following command line:  
-    `% sleep 20 &  ps -l`  
+    For example:
+    `% xterm &`
+    The commannd line starts command `xterm` in the background (i.e., the shell will not wait for the process to terminate and you can type in the next command immediately). The following command line:
+    `% sleep 20 &  ps -l`
     ... starts command `sleep 20` and immediately execute command `ps -l` without waiting for command `sleep 20` to finish first.
 
 1. **Sequential job execution**
 
-    For example the command line:  
-    `%  sleep 20 ; ps -l`  
+    For example the command line:
+    `%  sleep 20 ; ps -l`
     ... starts command `sleep 20` first, and wait for it to finish, then execute command `ps -l`.
 
 1. **The shell environment**
@@ -72,7 +73,7 @@ Design and implement a simple UNIX shell program using the grammar specified in 
 1. **The shell built-in command exit**
 
     Use the built-in command exit to terminate the shell program.
-  
+
 The behaviour of the above commands (except `prompt`) should be as close to those of the Bash shell as possible. In addition, your shell should not be terminated by CTRL-C, CTRL-\, or CTRL-Z.
 
 Finally you must not use any existing shell program to implement your shell (for example by calling a shell through the function `system`). That would defeat the purpose of this project.
@@ -131,14 +132,14 @@ An informal definition plus additional explanations of the syntax is given below
 A major part of Project 1 is a command line parser. You need to break a command line into an array of commands and each array element contains the detail of one command. I suggest that you use a structure similiar to the one given below to represent a command.
 
 ```
-struct Command_struct { 
+struct Command_struct {
      char *com_pathname;     // what is the path name of the command
      int argc;               // the number of arguments to the command
                              // including the command itself
      char *argv[MAX_ARGS];   // pointers to strings, each string
                              // is an argument for the command, including
                              // argument "0". The last pointer should
-                             // be set to NULL. 
+                             // be set to NULL.
      char *redirect_in;      // if this is not NULL, then the standard input
                              // is redirected to the given file name
      char *redirect_out;     // if this is not NULL, then the standard output
@@ -156,24 +157,24 @@ You may want to use the fucntion `printComStruct` given below to test the parser
 
 ```
 void printComStruct(struct Command_struct *com)
-{ 
+{
     int i;
 
-    fprintf(stderr,"com_pathname=%s\n", com->com_pathname); 
-    fprintf(stderr,"argc=%d\n", com->argc); 
-    for(i=0;  com->argv[i]!=NULL; i++) 
-        fprintf(stderr,"argv[%d]=%s\n", i, com->argv[i]); 
-        fprintf(stderr,"#######\n"); 
+    fprintf(stderr,"com_pathname=%s\n", com->com_pathname);
+    fprintf(stderr,"argc=%d\n", com->argc);
+    for(i=0;  com->argv[i]!=NULL; i++)
+        fprintf(stderr,"argv[%d]=%s\n", i, com->argv[i]);
+        fprintf(stderr,"#######\n");
         if (com->redirect_in == NULL)
-            fprintf(stderr,"redirect_in=NULL\n"); 
+            fprintf(stderr,"redirect_in=NULL\n");
         else
-            fprintf(stderr,"redirect_in=%s\n", com->redirect_in); 
+            fprintf(stderr,"redirect_in=%s\n", com->redirect_in);
         if (com->redirect_out == NULL)
-            fprintf(stderr,"redirect_out=NULL\n"); 
+            fprintf(stderr,"redirect_out=NULL\n");
         else
-            fprintf(stderr,"redirect_out=%s\n", com->redirect_out); 
-        fprintf(stderr,"com_suffix=%c\n\n", com->com_suffix); 
-} 
+            fprintf(stderr,"redirect_out=%s\n", com->redirect_out);
+        fprintf(stderr,"com_suffix=%c\n\n", com->com_suffix);
+}
 ```
 
 For example, if the input line is: `/bin/sleep 10 & ls -lt xyz > junk`, calling the above function should result in a "dump" of the raw contents of two structures (because there are two commands) shown below:
@@ -199,7 +200,7 @@ argv[2]=xyz
 #######
 redirect_in=NULL
 redirect_out=junk
-com_suffix= 
+com_suffix=
 
 *** ICT310 comstruct dump end ***
 ```
@@ -217,7 +218,7 @@ int status;          // termination status of the zombie
 
 while (more) {
     pid = waitpid(-1, &status, WNOHANG);
-    if (pid≤0) 
+    if (pid≤0)
         more = 0;
 }
 ```
@@ -265,7 +266,7 @@ char *linept;        // pointer to the line buffer
 while (again) {
       again = 0;
       linept = fgets(line, LENGTH_OF_LINE, stdin);
-      if (linept == NULL) 
+      if (linept == NULL)
           if (errno == EINTR)
               again = 1;        // signal interruption, read again
 }
